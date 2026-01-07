@@ -15,44 +15,38 @@ const RADIUS_DEGREES = 0.15;
  * @returns {Promise<Array>} - List of restaurant names
  * @throws {Error} if fetch fails or no results found.
  */
-export const fetchRestaurants = async (location, category) => {
+export const fetchRestaurants = async (location, category, radius = 16000) => {
   if (!location || !location.lat || !location.lng) {
     throw new Error("Location required for real data search.");
   }
 
   // Construct Overpass QL query
-  // We search nicely inside a box to be faster than "around" on huge datasets, 
-  // but "around" is simpler for a radius. Let's use "around".
-  // 16000 meters ~ 10 miles.
-
-  // Mapping categories to OSM tags if possible
-  // Common: amenity=restaurant, amenity=fast_food, amenity=cafe
-  // If category is "Pizza", we could add [cuisine=pizza].
+  // radius defaults to 16000 (10 miles), retries will pass smaller values.
 
   let tags = `
-    nwr["amenity"~"restaurant|fast_food|cafe"](around:16000, ${location.lat}, ${location.lng});
+    nwr["amenity"~"restaurant|fast_food|cafe"](around:${radius}, ${location.lat}, ${location.lng});
   `;
 
   // Simple optimization: if specific category, refine query?
-  // OSM `cuisine` tag is messy. Let's precise key mappings:
   if (category) {
     const catLower = category.toLowerCase();
-    if (catLower === 'burgers') tags = `nwr["cuisine"="burger"](around:16000, ${location.lat}, ${location.lng});`;
-    else if (catLower === 'pizza') tags = `nwr["cuisine"="pizza"](around:16000, ${location.lat}, ${location.lng});`;
-    else if (catLower === 'asian') tags = `nwr["cuisine"~"asian|chinese|japanese|thai|vietnamese"](around:16000, ${location.lat}, ${location.lng});`;
-    else if (catLower === 'mexican') tags = `nwr["cuisine"="mexican"](around:16000, ${location.lat}, ${location.lng});`;
-    else if (catLower === 'dessert') tags = `nwr["cuisine"~"ice_cream|bakery"](around:16000, ${location.lat}, ${location.lng});`;
-    // For "Diner", it's hard. Default to generic restaurant.
+    if (catLower === 'burgers') tags = `nwr["cuisine"="burger"](around:${radius}, ${location.lat}, ${location.lng});`;
+    else if (catLower === 'pizza') tags = `nwr["cuisine"="pizza"](around:${radius}, ${location.lat}, ${location.lng});`;
+    else if (catLower === 'asian') tags = `nwr["cuisine"~"asian|chinese|japanese|thai|vietnamese"](around:${radius}, ${location.lat}, ${location.lng});`;
+    else if (catLower === 'mexican') tags = `nwr["cuisine"="mexican"](around:${radius}, ${location.lat}, ${location.lng});`;
+    else if (catLower === 'dessert') tags = `nwr["cuisine"~"ice_cream|bakery"](around:${radius}, ${location.lat}, ${location.lng});`;
   }
 
+  // Timeout: If radius is large, give more time. If small retry, fail fast.
+  const timeoutVal = radius > 5000 ? 60 : 25;
+
   const query = `
-    [out:json][timeout:60];
+    [out:json][timeout:${timeoutVal}];
     (
       ${tags}
     );
     out center 50; 
   `;
-  // Limit to 50 results to keep the slot machine reel manageable.
 
   try {
     const response = await fetch(OVERPASS_URL, {
@@ -61,12 +55,26 @@ export const fetchRestaurants = async (location, category) => {
     });
 
     if (!response.ok) {
+      // Smart Retry Logic for Timeouts (504) or Throttling (429)
+      if (response.status === 504 || response.status === 429) {
+        console.warn(`API Error ${response.status} at radius ${radius}. Retrying with smaller radius...`);
+
+        if (radius > 5000) {
+          // Retry with ~3 miles (5000m)
+          return fetchRestaurants(location, category, 5000);
+        } else if (radius > 3000) {
+          // Last ditch retry with ~1.8 miles (3000m)
+          return fetchRestaurants(location, category, 3000);
+        }
+      }
       throw new Error(`Overpass API Error: ${response.status}`);
     }
 
     const data = await response.json();
 
     if (!data.elements || data.elements.length === 0) {
+      // If no results and we are searching a small area, maybe we shouldn't fail hard?
+      // But for now, let's just throw.
       throw new Error("No places found nearby! Try a different category?");
     }
 
@@ -84,7 +92,7 @@ export const fetchRestaurants = async (location, category) => {
 
   } catch (err) {
     console.error("Fetch failed:", err);
-    throw err; // Propagate error to App.jsx to show user message
+    throw err;
   }
 };
 
