@@ -1,0 +1,49 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Pacifico&display=swap');
+
+:root {
+  /* 50s Diner Palette */
+  --color-teal: #20b2aa;
+  --color-teal-dark: #008080;
+  --color-pink: #ffb6c1;
+  --color-pink-dark: #ff69b4;
+  --color-cream: #fffdd0;
+  --color-chrome: #e0e0e0;
+  --color-chrome-shine: #ffffff;
+  --color-black: #222222;
+  --color-red: #d32f2f;
+
+  --font-heading: 'Pacifico', cursive;
+  --font-body: 'Inter', sans-serif;
+
+  --space-unit: 8px;
+  --border-radius: 12px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--color-black);
+  /* Checkered Floor Pattern Background */
+  background-image:
+    linear-gradient(45deg, #1a1a1a 25%, transparent 25%),
+    linear-gradient(-45deg, #1a1a1a 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #1a1a1a 75%),
+    linear-gradient(-45deg, transparent 75%, #1a1a1a 75%);
+  background-size: 40px 40px;
+  background-position: 0 0, 0 20px, 20px -20px, -20px 0px;
+  color: var(--color-white);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+button {
+  font-family: var(--font-heading);
+  cursor: pointer;
+}
