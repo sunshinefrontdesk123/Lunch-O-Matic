@@ -9,6 +9,7 @@ import './App.css';
 function App() {
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const [showCravingModal, setShowCravingModal] = useState(false);
   const [restaurants, setRestaurants] = useState([]);
   const [spinning, setSpinning] = useState(false);
   const [result, setResult] = useState(null);
@@ -83,24 +84,59 @@ function App() {
     <DinerFrame title="Lunch-O-Matic">
       <div className="control-panel">
         <label className="panel-label">1. Pick a Craving:</label>
-        <div className="category-grid">
-          <button
-            className={`category-btn ${selectedCategory === null ? 'active' : ''}`}
-            onClick={() => setSelectedCategory(null)}
-          >
-            <Star size={16} /> Any
-          </button>
-          {categories.map(cat => (
-            <button
-              key={cat}
-              className={`category-btn ${selectedCategory === cat ? 'active' : ''}`}
-              onClick={() => setSelectedCategory(cat)}
-            >
-              <Utensils size={16} /> {cat}
-            </button>
-          ))}
-        </div>
+        <button
+          className="craving-trigger"
+          onClick={() => setShowCravingModal(true)}
+        >
+          {selectedCategory ? (
+            <>
+              <Utensils size={20} />
+              <span className="trigger-text">{selectedCategory}</span>
+            </>
+          ) : (
+            <>
+              <Star size={20} />
+              <span className="trigger-text">Any Craving</span>
+            </>
+          )}
+          <span className="trigger-arrow">▼</span>
+        </button>
       </div>
+
+      {showCravingModal && (
+        <div className="craving-modal-overlay" onClick={() => setShowCravingModal(false)}>
+          <div className="craving-modal-content" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>Select a Craving</h3>
+              <button className="modal-close" onClick={() => setShowCravingModal(false)}>×</button>
+            </div>
+            <div className="category-grid">
+              <button
+                className={`category-btn ${selectedCategory === null ? 'active' : ''}`}
+                onClick={() => {
+                  setSelectedCategory(null);
+                  setShowCravingModal(false);
+                }}
+              >
+                <Star size={16} /> Any
+              </button>
+              {categories.map(cat => (
+                <button
+                  key={cat}
+                  className={`category-btn ${selectedCategory === cat ? 'active' : ''}`}
+                  onClick={() => {
+                    setSelectedCategory(cat);
+                    setShowCravingModal(false);
+                  }}
+                >
+                  <Utensils size={16} /> {cat}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
 
       <div className="slot-stage">
         {locationError ? (
@@ -125,21 +161,23 @@ function App() {
         </button>
       </div>
 
-      {result && !spinning && (
-        <div className="winner-display">
-          <div className="winner-label">Let's Eat At:</div>
-          <a
-            href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(result)}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="winner-link"
-          >
-            <div className="winner-name">{result}</div>
-          </a>
-          <div className="winner-location"><MapPin size={16} /> Click to Open Maps</div>
-        </div>
-      )}
-    </DinerFrame>
+      {
+        result && !spinning && (
+          <div className="winner-display">
+            <div className="winner-label">Let's Eat At:</div>
+            <a
+              href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(result)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="winner-link"
+            >
+              <div className="winner-name">{result}</div>
+            </a>
+            <div className="winner-location"><MapPin size={16} /> Click to Open Maps</div>
+          </div>
+        )
+      }
+    </DinerFrame >
   );
 }
 
