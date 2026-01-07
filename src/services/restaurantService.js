@@ -47,6 +47,7 @@ export const fetchRestaurants = async (location, category, radius = 8000, server
     else if (catLower === 'mexican') tags = `nwr["cuisine"="mexican"](around:${radius}, ${location.lat}, ${location.lng});`;
     else if (catLower === 'dessert') tags = `nwr["cuisine"~"ice_cream|bakery"](around:${radius}, ${location.lat}, ${location.lng});`;
     else if (catLower === 'diner') tags = `nwr["cuisine"="diner"](around:${radius}, ${location.lat}, ${location.lng});`;
+    else if (catLower === 'seafood') tags = `nwr["cuisine"="seafood"](around:${radius}, ${location.lat}, ${location.lng});`;
   }
 
   // Timeout: generous to prevent 504 on server side if possible
@@ -126,5 +127,5 @@ export const fetchRestaurants = async (location, category, radius = 8000, server
 };
 
 export const getCategories = () => [
-  "Burgers", "Pizza", "Asian", "Mexican", "Diner", "Dessert"
+  "Burgers", "Pizza", "Asian", "Mexican", "Seafood", "Diner", "Dessert"
 ];

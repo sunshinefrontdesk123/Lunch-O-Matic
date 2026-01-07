@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import DinerFrame from './components/DinerFrame/DinerFrame';
 import SlotMachine from './components/SlotMachine/SlotMachine';
+import InstallPrompt from './components/InstallPrompt/InstallPrompt';
 import { fetchRestaurants, getCategories } from './services/restaurantService';
 import { Utensils, MapPin, Star } from 'lucide-react';
 import spinSound from './assets/musicfx-dj-1767805169902.ogg';
@@ -82,6 +83,7 @@ function App() {
 
   return (
     <DinerFrame title="Lunch-O-Matic">
+      <InstallPrompt />
       <div className="control-panel">
         <label className="panel-label">1. Pick a Craving:</label>
         <button
