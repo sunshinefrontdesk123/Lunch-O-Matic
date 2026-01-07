@@ -1,6 +1,6 @@
 {
     "name": "Lunch-O-Matic",
-    "short_name": "LunchO",
+    "short_name": "Lunch-O-Matic",
     "description": "Can't decide where to eat? Spin the wheel!",
     "start_url": "./",
     "display": "standalone",
@@ -10,12 +10,14 @@
         {
             "src": "lunchomatic.png",
             "sizes": "192x192",
-            "type": "image/png"
+            "type": "image/png",
+            "purpose": "any maskable"
         },
         {
             "src": "lunchomatic.png",
             "sizes": "512x512",
-            "type": "image/png"
+            "type": "image/png",
+            "purpose": "any maskable"
         }
     ]
 }
