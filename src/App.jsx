@@ -149,20 +149,8 @@ function App() {
             spinning={spinning}
           />
         )}
-      </div>
 
-      <div className="action-area">
-        <button
-          className={`spin-btn ${spinning ? 'disabled' : ''}`}
-          onClick={handleSpin}
-          disabled={spinning}
-        >
-          {spinning ? 'Searching & Spinning...' : 'SPIN THE WHEEL'}
-        </button>
-      </div>
-
-      {
-        result && !spinning && (
+        {result && !spinning && (
           <div className="winner-display">
             <div className="winner-label">Let's Eat At:</div>
             <a
@@ -175,8 +163,18 @@ function App() {
             </a>
             <div className="winner-location"><MapPin size={16} /> Click to Open Maps</div>
           </div>
-        )
-      }
+        )}
+      </div>
+
+      <div className="action-area">
+        <button
+          className={`spin-btn ${spinning ? 'disabled' : ''}`}
+          onClick={handleSpin}
+          disabled={spinning}
+        >
+          {spinning ? 'Searching & Spinning...' : 'SPIN THE WHEEL'}
+        </button>
+      </div>
     </DinerFrame >
   );
 }

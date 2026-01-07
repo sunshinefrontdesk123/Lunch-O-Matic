@@ -97,6 +97,8 @@
 
 .slot-stage {
   margin: 10px 0;
+  position: relative;
+  /* Context for overlay */
 }
 
 .action-area {
@@ -130,27 +132,46 @@
 }
 
 .winner-display {
+  position: absolute;
+  /* Overlay */
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  /* Centered */
+  width: 90%;
+  max-width: 400px;
+  z-index: 50;
+  /* Above slot reel */
+
   background: var(--color-cream);
   border: 4px dashed var(--color-red);
   border-radius: 15px;
   padding: 20px;
-  margin-top: 20px;
-  animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  /* margin-top removed */
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+  /* Lift it up */
+
+  /* Dispense animation */
+  animation: dispenseTicket 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transform-origin: top center;
 }
 
-@keyframes popIn {
+@keyframes dispenseTicket {
   0% {
-    transform: scale(0);
+    transform: translate(-50%, -150%) rotateX(-90deg) scale(0.5);
+    /* Start above and folded? or just above */
     opacity: 0;
   }
 
-  100% {
-    transform: scale(1);
+  60% {
+    transform: translate(-50%, -40%);
+    /* Overshoot slightly */
     opacity: 1;
   }
 
   100% {
-    transform: scale(1);
+    transform: translate(-50%, -50%);
+    /* Land centered */
     opacity: 1;
   }
 }
